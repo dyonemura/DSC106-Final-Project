@@ -2,4 +2,8 @@
   import App from '../components/App.svelte';
 </script>
 
-<App />
+<main>
+  <h1>Visualizing the Unseen</h1>
+  <App />
+
+</main>
