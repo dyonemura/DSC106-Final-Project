@@ -12,6 +12,7 @@
     displayText = text;
   }
 
+
   // Encryption Code
   let encryptedText = '';
   let encryptedLst = [];
@@ -122,6 +123,7 @@ $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
   //        {/each}
   //     </p>
   //    {/if}
+  // Random comment to test
 
 </script>
 
