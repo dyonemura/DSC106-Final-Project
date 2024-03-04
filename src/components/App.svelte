@@ -48,6 +48,7 @@
   let secretKey_lst = [];
   let charCodeLst = [];
   let secretKey = 'asjfbf712hrbajb';
+  let encryptedCharCode = [];
 
   let shift = 0;
   for (let i = 0; i < secretKey.length; i++) {
@@ -152,11 +153,63 @@ $: encryptedText = rsaEncrypt(keys.publicKey, displayText);
 $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
 
 
-  import { tick } from 'svelte';
+import { tick } from 'svelte';
   
-  let loo = 'hello';
-  
+  $: loo = text;
+  $: target = encrypt(text, shift);
+  $: currentWord = loo;
+  $: currentLetterChar = 0;
+  $: equation = [];
+  $: currentEncryptedChar = 0;
 
+
+  function isUppercase(char) {
+    return char === char.toUpperCase();
+}
+function isLowercase(char) {
+    return char === char.toUpperCase();
+}
+
+  function replaceOneLetterAtATime() {
+    const wordArray = currentWord.split("");
+    const targetArray = target.split("");
+
+    for (let i = 0; i < wordArray.length; i++) {
+      const currentLetter = wordArray[i];
+      currentLetterChar = charCodeLst[i];
+
+      if (isUppercase(currentLetter)) {
+        equation[i] = `((${currentLetterChar} - 65 + ${shift}) % 26) + 65`;
+      }
+      if (isLowercase(currentLetter)) {
+        equation[i] = `((${currentLetterChar} - 97 + ${shift}) % 26) + 97`;
+      }
+
+
+      currentEncryptedChar = simpleEncryptedText[i];
+
+      if (wordArray[i] !== targetArray[i]) {
+        wordArray[i] = targetArray[i];
+        currentWord = wordArray.join("");
+        break; // Replace only one letter at a time
+      }
+    }
+  }
+
+  // Simulate automatic replacement
+  const interval = 2000; // 1 second
+  let timer;
+
+  function startReplacement() {
+    timer = setInterval(replaceOneLetterAtATime, interval);
+  }
+
+  function stopReplacement() {
+    clearInterval(timer);
+  }
+
+  // Start the replacement process when the component is mounted
+  startReplacement();
 </script>
 
 <style>
@@ -256,9 +309,7 @@ $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
 
   @keyframes letterChange {
     0% { opacity: 1; }
-    25% { opacity: 0.5; }
     50% { opacity: 0; }
-    75% { opacity: 0.5; }
     100% { opacity: 1; }
   }
 </style>
@@ -325,11 +376,10 @@ $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
     <section> 
       {#if index === 2}
         <h1 transition:fade>{"Symmetric Key Encryption"}</h1>
-        <p transition:fade>{`You and your friend both have a randomly generated encryption key: ${secretKey}`}</p>
-        <p>{simpleEncryptedText}</p>
-        {#each text as l}
-          {l}
-        {/each}
+        <p transition:fade>{`You and your friend both have a randomly generated encryption key: ${secretKey} for decoding the message.`}</p>
+        <p transition:fade>{`The decoding algorithm:`}</p>
+
+        <p transition:fade>{`A -> 1 -> 1 + shift -> ?`}</p>
 
 
 
@@ -337,7 +387,10 @@ $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
 
         
         
-        
+        {currentWord}
+        {currentLetterChar}
+        {equation}
+        {currentEncryptedChar} 
       {/if}
 
       
