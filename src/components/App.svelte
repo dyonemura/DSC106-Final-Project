@@ -1,13 +1,15 @@
 <script>
   import Scroller from "@sveltejs/svelte-scroller";
   import { fade } from 'svelte/transition';
+  import { inview } from 'svelte-inview';
 
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   let animate = false;
 
-  onMount(() => {
-    
-  });
+  
+
+  let isInView = false;
+  const options = {};
 
   let count, index, offset, progress;
 
@@ -49,6 +51,7 @@
   let charCodeLst = [];
   let secretKey = 'asjfbf712hrbajb';
   let encryptedCharCode = [];
+  let encryptionLoop = [];
 
   let shift = 0;
   for (let i = 0; i < secretKey.length; i++) {
@@ -209,7 +212,42 @@ function isLowercase(char) {
   }
 
   // Start the replacement process when the component is mounted
-  startReplacement();
+  
+  encryptionLoop = ["Initial Letter: A", "Convert to Number: 1", '1 (A) + 3 (The Shift)', "Shifted Number: 4", "Final Letter: D"];
+  let currentElement = encryptionLoop[0];
+  let indexxx = 0;
+  let intervalId;
+
+  onMount(() => {
+    inview.observe(options);
+  });
+
+  function starter(encryptionLoopoop) {
+    let intervalId = setInterval(() => {
+      if (indexxx >= encryptionLoop.length) {
+        clearInterval(intervalId);
+      } else {
+        currentElement = encryptionLoop[indexxx];
+        indexxx++;
+      }
+    }, 5000);
+  }
+
+  $: if (isInView) {
+    startReplacement();
+    starter(encryptionLoop);
+    
+    
+  } else if (intervalId) {
+    clearInterval(intervalId);
+  }
+
+  onDestroy(() => {
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+  });
+
 </script>
 
 <style>
@@ -376,21 +414,34 @@ function isLowercase(char) {
     <section> 
       {#if index === 2}
         <h1 transition:fade>{"Symmetric Key Encryption"}</h1>
-        <p transition:fade>{`You and your friend both have a randomly generated encryption key: ${secretKey} for decoding the message.`}</p>
-        <p transition:fade>{`The decoding algorithm:`}</p>
+        <p transition:fade>{`You and your friend both have a randomly generated encryption key given to you by a messaging app for decoding the message: ${secretKey}`}</p>
+        <p transition:fade>{`An example encryption algorithm: Caesar Shift`}</p>
+        <p transition:fade>{`Substitute each letter by shifting it down/up the alphabet.`}</p>
 
-        <p transition:fade>{`A -> 1 -> 1 + shift -> ?`}</p>
-
+        <div use:inview={options}
+          on:inview_change={(event) => {
+            const { inView, entry, scrollDirection, observer, node} = event.detail;
+            isInView = inView;
+          }}
+          on:inview_enter={(event) => {
+            const { inView, entry, scrollDirection, observer, node} = event.detail;
+            isInView = inView;
+          }}
+          on:inview_leave={(event) => {
+            const { inView, entry, scrollDirection, observer, node} = event.detail;
+            isInView = inView;
+          }}
+          on:inview_init={(event) => {
+            const { observer, node } = event.detail;
+          }}>{isInView ? currentElement : 'Bye, Bye'}
+      </div>
 
 
 
 
         
         
-        {currentWord}
-        {currentLetterChar}
-        {equation}
-        {currentEncryptedChar} 
+        
       {/if}
 
       
