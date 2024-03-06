@@ -5,9 +5,7 @@
 
   import { onMount, onDestroy } from 'svelte';
   let animate = false;
-
-  
-
+  let animate2 = false;
   let isInView = false;
   const options = {};
 
@@ -45,19 +43,58 @@
   }, 3000)
   }
 
+  const moveWord2 = () => {
+    const start = document.getElementById('start');
+    const end = document.getElementById('end');
+    const word = document.querySelector('.word');
+    const section = document.querySelector('section');
+
+    const sectionRect = section.getBoundingClientRect();
+    const startPosition = start.getBoundingClientRect().right - sectionRect.left;
+    const endPosition = end.getBoundingClientRect().left - sectionRect.left;
+
+    const midPosition = (startPosition + endPosition) / 2;
+
+    let position = startPosition; 
+    word.style.left = `${position}px`; 
+
+    setTimeout(() => {
+    word.textContent = "Encrypted with key: " + simpleEncryptedText; // Change the word to the encrypted text
+  }, 2000); // Wait for 2 seconds before changing the text
+
+  setTimeout(() => {
+    word.textContent = simpleEncryptedText; // Change the word to the encrypted text
+  }, 4000); // Wait for 2 seconds before changing the text
+
+  setTimeout(() => {
+    position = position === startPosition ? midPosition : startPosition;
+    word.style.left = `${position}px`;
+    animate2 = true;
+
+    setTimeout(() => {
+      position = endPosition;
+      word.style.left = `${position}px`;
+    }, 4500); // Start the animation 2 seconds after changing the text
+  }, 4750);
+
+  }
+
   // Encryption Code
   let encryptedText = '';
   let secretKey_lst = [];
   let charCodeLst = [];
   let secretKey = 'asjfbf712hrbajb';
-  let encryptedCharCode = [];
   let encryptionLoop = [];
+  let secretKeyText = secretKey.split('')
+  
 
   let shift = 0;
   for (let i = 0; i < secretKey.length; i++) {
       shift += secretKey.charCodeAt(i);
       secretKey_lst.push(secretKey.charCodeAt(i))
   }
+
+  let secretKeySum = secretKey_lst.reduce((partialSum, currentNumber) => partialSum + currentNumber, 0);
   shift = shift % 26;
 
   // Caesar Cypher
@@ -155,8 +192,7 @@ $: simpleEncryptedText = encrypt(text, shift)
 $: encryptedText = rsaEncrypt(keys.publicKey, displayText);
 $: decryptedText = rsaDecrypt(keys.privateKey, encryptedText);
 
-
-import { tick } from 'svelte';
+  // Animation Code
   
   $: loo = text;
   $: target = encrypt(text, shift);
@@ -213,8 +249,8 @@ function isLowercase(char) {
 
   // Start the replacement process when the component is mounted
   
-  encryptionLoop = ["Initial Letter: A", "Convert to Number: 1", '1 (A) + 3 (The Shift)', "Shifted Number: 4", "Final Letter: D"];
-  let currentElement = encryptionLoop[0];
+  encryptionLoop = ["Step 1 - Convert to Number: A = 1", 'Step 2: Apply Shift - 1 + 3 = 4', "Step 3 - Convert Number to Letter: 4 = D"];
+  let currentElement = '';
   let indexxx = 0;
   let intervalId;
 
@@ -222,12 +258,18 @@ function isLowercase(char) {
     inview.observe(options);
   });
 
-  function starter(encryptionLoopoop) {
+  function starter(encryptionLoop) {
     let intervalId = setInterval(() => {
       if (indexxx >= encryptionLoop.length) {
         clearInterval(intervalId);
       } else {
-        currentElement = encryptionLoop[indexxx];
+        let para = document.createElement("p");
+        let node = document.createTextNode(encryptionLoop[indexxx]);
+        para.appendChild(node);
+        para.className = 'fade';
+        let element = document.getElementById("steps");
+        element.appendChild(para);
+        setTimeout(() => para.className += ' in', 50); // Add 'in' class after a small delay
         indexxx++;
       }
     }, 5000);
@@ -257,7 +299,7 @@ function isLowercase(char) {
   }
   .word {
     position: absolute;
-    transition: all 2s ease-in-out;
+    transition: left 2s ease-in-out, opacity 1s;
   }
   .background {
     width: 100%;
@@ -317,7 +359,35 @@ function isLowercase(char) {
     100% { border-top: 40px solid black; }
   }
 
+  .arrow2 {
+    display: none;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 40px solid black;
+    transition: border-top 2s;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .arrow2.animate {
+    display: block;
+    animation: draw-arrow 2s forwards;
+  }
+
+  @keyframes draw-arrow2 {
+    0% { border-top: 0 solid black; }
+    100% { border-top: 40px solid black; }
+  }
+
   .container {
+    display: flex;
+    align-items: center;
+  }
+
+  .container2 {
     display: flex;
     align-items: center;
   }
@@ -349,6 +419,15 @@ function isLowercase(char) {
     0% { opacity: 1; }
     50% { opacity: 0; }
     100% { opacity: 1; }
+  }
+
+    .fade {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+  }
+
+  .fade.in {
+    opacity: 1;
   }
 </style>
 
@@ -404,59 +483,81 @@ function isLowercase(char) {
       </div>
     
       <div class="word" style="left: 0;">{text}</div>
-
       {/if}
-      <p transition:fade={{duration: 2000}}>{""}</p>
 
     </section>
 
     <!--Section 3-->
     <section> 
       {#if index === 2}
-        <h1 transition:fade>{"Symmetric Key Encryption"}</h1>
-        <p transition:fade>{`You and your friend both have a randomly generated encryption key given to you by a messaging app for decoding the message: ${secretKey}`}</p>
-        <p transition:fade>{`An example encryption algorithm: Caesar Shift`}</p>
-        <p transition:fade>{`Substitute each letter by shifting it down/up the alphabet.`}</p>
+      <h1 transition:fade>{"Symmetric Key Encryption"}</h1>
+      <p transition:fade>{`You and your friend both have a randomly generated encryption key. This key is important as it contains the necessary information to decode the decrypted text. We will use a simple Caesar cypher to show the importance of a key.`}</p>
+      {/if}
 
-        <div use:inview={options}
-          on:inview_change={(event) => {
-            const { inView, entry, scrollDirection, observer, node} = event.detail;
-            isInView = inView;
-          }}
-          on:inview_enter={(event) => {
-            const { inView, entry, scrollDirection, observer, node} = event.detail;
-            isInView = inView;
-          }}
-          on:inview_leave={(event) => {
-            const { inView, entry, scrollDirection, observer, node} = event.detail;
-            isInView = inView;
-          }}
-          on:inview_init={(event) => {
-            const { observer, node } = event.detail;
-          }}>{isInView ? currentElement : 'Bye, Bye'}
+    </section>
+    <!--Section 4-->
+    <section> 
+      {#if index === 3}
+      <h1 transition:fade>{"Symmetric Key Encryption: Caesar Cypher Example"}</h1>
+      <p transition:fade>{`Substitute each letter by shifting it down/up the alphabet.`}</p>
+      <p transition:fade>{`Letter to Encrypt: A; Shift 3`}</p>
+
+      <div id=steps use:inview={options}
+        on:inview_change={(event) => {
+          const { inView, entry, scrollDirection, observer, node} = event.detail;
+          isInView = inView;
+        }}
+        on:inview_enter={(event) => {
+          const { inView, entry, scrollDirection, observer, node} = event.detail;
+          isInView = inView;
+        }}
+        on:inview_leave={(event) => {
+          const { inView, entry, scrollDirection, observer, node} = event.detail;
+          isInView = inView;
+        }}
+        on:inview_init={(event) => {
+          const { observer, node } = event.detail;
+        }}>{isInView ? currentElement : 'Bye, Bye'}
+    </div>  
+      {/if}
+
+    </section>
+    <!--Section 5-->
+    <section> 
+      {#if index === 4}
+      <h1 transition:fade>{"Symmetric Key Encryption: Our Algorithm"}</h1>
+      <p transition:fade> {`You and your friend's key: ${secretKey}`}</p>
+      <p transition:fade> {secretKeyText}</p>
+      <p transition:fade> Convert each letter to its character code</p>
+      <p transition:fade> {secretKey_lst}</p>
+      <p transition:fade>Sum all values: {secretKeySum}</p>
+      <p transition:fade> Find remainder of summed values divided by 26, the number of letters in the alphabet</p>
+      <p transition:fade> Given the key, our shift value is: {shift}</p>
+      <p transition:fade> Your word:{text}. Your encrypted word: {simpleEncryptedText}</p>
+      {/if}
+    </section>
+
+    <!--Section 6-->
+    <section> 
+    
+      {#if index === 5}
+      <h1>With Symmetric Encryption</h1>
+
+      <button on:click={moveWord2}>Send Text to Friend</button>
+      <p transition:fade>{"Spy"}</p>
+
+      <div class="container2">
+        <div class="arrow2" class:animate={animate2}></div>
+        <span>Intercepted</span>
       </div>
 
-
-
-
-        
-        
-        
+      <div style="width: 100%; display: flex; justify-content: space-between;">
+        <div id="start">You</div>
+        <div id="end">Your Friend</div>
+      </div>
+    
+      <div class="word" style="left: 0;">{text}</div>
       {/if}
-
-      
-    </section>
-    <section> 
-      {#if index === 2}
-        <p transition:fade>{displayText}</p>
-        <p transition:fade>{encryptedText}</p>
-        <p transition:fade>{decryptedText}</p>
-      {/if}
-
-    </section>
-    <section> 
-    </section>
-    <section> 
 
     </section>
     <section> 
