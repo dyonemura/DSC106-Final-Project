@@ -1,9 +1,19 @@
 <script>
-  import App from '../components/App.svelte';
+  import App from "../components/App.svelte";
+  import { draw } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
 </script>
 
 <main>
-  <h1>Visualizing the Unseen</h1>
-  <App />
-
+  <body>
+    <App />
+  </body>
 </main>
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: rgb(168, 168, 201);
+  }
+</style>
