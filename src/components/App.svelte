@@ -8,7 +8,7 @@
   let count, index, offset, progress;
 
   //Text Code
-  let text = "Password";
+  let text = "";
   let displayText = text;
 
   function setText() {
@@ -259,6 +259,11 @@
   let currentElement = "";
   let indexxx = 0;
   let intervalId;
+  function createMarquee() {
+    const marquee = document.createElement("marquee");
+    marquee.textContent = "Lets Move this text.";
+    document.querySelector(".laptop2").appendChild(marquee);
+  }
 
   onMount(() => {
     inview.observe(options);
@@ -321,10 +326,20 @@
   let five = false;
   let six = false;
   let intro = true;
+
+  import { fade } from "svelte/transition";
+  let visible = false;
+  let subsection1 = false;
+  let nopswrd = true;
+  let sent2 = false;
 </script>
 
 {#if intro}
   <div class="laptop">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <h1 class="maintitle">Visualize The Unseen</h1>
     <p style="color: white;  font-size:3rem">Bryan Gonzalez</p>
     <p style="color: white;  font-size:3rem">David Yonemura</p>
@@ -340,12 +355,46 @@
 {:else if bpressed}
   {#if one}
     <div class="laptop2">
+      <label style="color: white;" for="name"
+        >Password (1 to 5 characters):</label
+      >
       <input
         bind:value={text}
         maxlength="5"
         style="width: 10rem; height: 2rem;  text-align:center; margin-right:10rem"
+        placeholder="Set your password"
       />
-      <button on:click={setText}>Set Password</button>
+      <button
+        class="pswrd"
+        on:click={() => {
+          subsection1 = false;
+          visible = true;
+          nopswrd = false;
+          setTimeout(() => (visible = false), 2000);
+          setTimeout(() => (subsection1 = true), 10);
+        }}>Set Password</button
+      >
+      {#if nopswrd == true}
+        <p style="color: white; font-size:xx-large">Set a password first!</p>
+      {/if}
+      {#if visible}
+        <p style="color: white; font-size:large" in:fade>
+          Password Has Been Set
+        </p>
+      {/if}
+      {#if subsection1}
+        <div class="subsection" in:fade>
+          <p style="color: black">
+            Passwords are the most common type of information that hackers
+            target. Generally they are the only security between them and your
+            personal information
+          </p>
+          <p style="color: black" in:fade>
+            So wouldn't it make sense to have that password be incredibly hard
+            to access!?
+          </p>
+        </div>
+      {/if}
       <button
         class="goback"
         on:click={() => {
@@ -363,18 +412,53 @@
       >
     </div>
   {/if}
+
   {#if two}
-    <button on:click={moveWord}>Send Text to Friend</button>
     <div class="laptop2">
-      <div class="arrow" class:animate></div>
-      <span>Hacker Intercepted</span>
+      <button
+        class="pswrd"
+        style="background-color: white;"
+        on:click={() => {
+          sent2 = true;
+        }}>Play Animation</button
+      >
+      {#if sent2}
+        <marquee
+          direction="right"
+          behavior="alternate"
+          scrollamount="10"
+          style="border:BLACK 2px SOLID; color:white"
+          >Your Password: {text}</marquee
+        >
+        <div class="arrow" class:animate></div>
+        <span>Hacker Intercepted</span>
 
-      <div style="width: 100%; display: flex; justify-content: space-between;">
-        <div id="start">You</div>
-        <div id="end">Your Friend</div>
-      </div>
+        <div
+          style="width: 100%; display: flex; justify-content: space-between;"
+        >
+          <div id="start" style="color: white; font-size:xx-large">You</div>
+          <div id="end" style="color: white; font-size:xx-large">
+            Server / Application
+          </div>
+        </div>
+        <div class="subsection2" in:fade>
+          <p style="color: black">
+            This animation shows how passwords are passed through yourself and
+            the applications/servers that you use WITHOUT encryption
+          </p>
+          <p
+            style="color: red; background-color:rgba(244, 226, 226, 0.7);"
+            in:fade
+          >
+            What does this mean?
+          </p>
+          <p style="color: black" in:fade>
+            Anyone with some knowledge of how computer networks work can easily
+            steal your password in just a few seconds!
+          </p>
+        </div>
+      {/if}
 
-      <div class="word" style="left: 0;">{text}</div>
       <button
         class="goback"
         on:click={() => {
@@ -401,10 +485,15 @@
   {/if}
   {#if three}
     <div class="laptop2">
-      <h1>{"Symmetric Key Encryption"}</h1>
-      <p>
-        {`You and your friend both have a randomly generated encryption key. This key is important as it contains the necessary information to decode the decrypted text. We will use a simple Caesar cypher to show the importance of a key.`}
-      </p>
+      <h1 style="color: white;font-size:4rem">What is Encryption?</h1>
+      <div class="subsection2" in:fade>
+        <p>
+          Encryption is the process of converting text (Password in this case)
+          into ciphertext (unreadable format) using algorithms and keys. This
+          conversion makes it exponentially harder for hackers to access or read
+          your password.
+        </p>
+      </div>
       <button
         class="goback"
         on:click={() => {
@@ -431,13 +520,25 @@
   {/if}
   {#if four}
     <div class="laptop2">
-      <h1>
-        {"Symmetric Key Encryption: Caesar Cypher Example"}
+      <h1 style="color: white;">
+        {"Examples of Encryption"}
       </h1>
-      <p>
-        {`Substitute each letter by shifting it down/up the alphabet.`}
-      </p>
-      <p>Letter to Encrypt: A; Shift 3</p>
+      <div class="subsection2">
+        <p style="font-size: 2rem;">
+          Encryption is everywhere even if we dont' see it, for example it is in
+          every single application that uses a password like your bank, social
+          media, softwares, and even in wifi. Encryption is not limited to just
+          passwords; the files and emails you send to someone; if not encrypted
+          and you're connected to public wifi can easily be stolen in less than
+          a second. In some online business like online dating wesbites, they
+          encrypt your messages that you send other people. So this is all to
+          say that it is around you; its just unseen.
+        </p>
+        <img src="src/components/download.jpeg" alt="Hi" />
+        <img src="src/components/download.png" alt="Hi" />
+        <img src="src/components/social.jpeg" alt="" />
+        <img src="src/components/crying.jpeg" alt="" />
+      </div>
 
       <button
         class="goback"
@@ -465,20 +566,24 @@
   {/if}
   {#if five}
     <div class="laptop2">
-      <h1>{"Symmetric Key Encryption: Our Algorithm"}</h1>
-      <p>{`You and your friend's key: ${secretKey}`}</p>
-      <p>{secretKeyText}</p>
-      <p>Convert each letter to its character code</p>
-      <p>{secretKey_lst}</p>
-      <p>Sum all values: {secretKeySum}</p>
-      <p>
-        Find remainder of summed values divided by 26, the number of letters in
-        the alphabet
-      </p>
-      <p>Given the key, our shift value is: {shift}</p>
-      <p>
-        Your word:{text}. Your encrypted word: {simpleEncryptedText}
-      </p>
+      <h1 style="color: white;font-size:4rem">
+        {"Symmetric Key Encryption: Our Algorithm"}
+      </h1>
+      <div class="subsection2" style="font-size: 1.5rem;">
+        <p>{`You and your friend's key: ${secretKey}`}</p>
+        <p>{secretKeyText}</p>
+        <p>Convert each letter to its character code</p>
+        <p>{secretKey_lst}</p>
+        <p>Sum all values: {secretKeySum}</p>
+        <p>
+          Find remainder of summed values divided by 26, the number of letters
+          in the alphabet
+        </p>
+        <p>Given the key, our shift value is: {shift}</p>
+        <p>
+          Your password:{text}. Your encrypted password: {simpleEncryptedText}
+        </p>
+      </div>
       <button
         class="goback"
         on:click={() => {
@@ -505,18 +610,52 @@
   {/if}
   {#if six}
     <div class="laptop2">
-      <h1>With Symmetric Encryption</h1>
+      <button
+        class="pswrd"
+        style="background-color: white;"
+        on:click={() => {
+          sent2 = true;
+        }}>Play Animation</button
+      >
+      {#if sent2}
+        <marquee
+          direction="right"
+          behavior="alternate"
+          scrollamount="10"
+          style="border:BLACK 2px SOLID; color:white"
+          >Your Password: {simpleEncryptedText}</marquee
+        >
+        <div class="arrow" class:animate></div>
+        <span>Hacker Intercepted</span>
 
-      <button on:click={moveWord2}>Send Text to Friend</button>
-      <div class="arrow2" class:animate={animate2}></div>
-      <span>Hacker Intercepted</span>
-
-      <div style="width: 100%; display: flex; justify-content: space-between;">
-        <div id="start">You</div>
-        <div id="end">Your Friend</div>
-      </div>
-
-      <div class="word" style="left: 0;">{text}</div>
+        <div
+          style="width: 100%; display: flex; justify-content: space-between;"
+        >
+          <div id="start" style="color: white; font-size:xx-large">You</div>
+          <div id="end" style="color: white; font-size:xx-large">
+            Server / Application
+          </div>
+        </div>
+        <div class="subsection2" in:fade>
+          <p style="color: black; font-size: 2rem;">
+            This animation shows how passwords are passed through yourself and
+            the applications/servers WITH encryption
+          </p>
+          <p
+            style="color: green; background-color:rgba(244, 226, 226, 0.7); font-size: 2rem;"
+            in:fade
+          >
+            So I am completely safe now?
+          </p>
+          <p style="color: black; font-size: 2rem;" in:fade>
+            Unfortunately this is only a deterrent, your information can never
+            be completely secure as we have even seen the United States
+            government's information being stolen. But by following safe
+            protocols such as regularly changing your password and encrypting it
+            you can keep yourself in safer hands.
+          </p>
+        </div>
+      {/if}
       <button
         class="goback"
         on:click={() => {
@@ -545,7 +684,7 @@
             bpressed = true;
             one = true;
             event.stopPropagation();
-          }}>Set your password</button
+          }}>START HERE</button
         >
         <button
           class="homebutton2"
@@ -561,7 +700,7 @@
             bpressed = true;
             three = true;
             event.stopPropagation();
-          }}>One algorithm</button
+          }}>What is encyption?</button
         >
         <button
           class="homebutton4"
@@ -593,6 +732,23 @@
 {/if}
 
 <style>
+  .subsection2 {
+    font-size: 3rem;
+    background-color: rgba(244, 226, 226, 0.398);
+  }
+  .subsection {
+    font-size: 3rem;
+    margin-top: 5%;
+    background-color: rgba(244, 226, 226, 0.398);
+  }
+  .pswrd {
+    width: 8%;
+    height: 7%;
+    font-size: medium;
+  }
+  .sixtitle {
+    left: 20%;
+  }
   .maintitle {
     font-size: 5rem;
   }
@@ -757,8 +913,6 @@
     background-size: cover;
   }
   .laptop2 {
-    align-items: center;
-    justify-content: center;
     background-image: linear-gradient(rgb(106, 129, 243), rgb(184, 115, 189));
     position: relative;
     display: flex;
@@ -1015,5 +1169,15 @@
     background-position: 100%;
     background-size: 400%;
     transition: background 300ms ease-in-out;
+  }
+  .nunb {
+    height: 1rem;
+    margin-left: 45%;
+    margin-top: 10%;
+    background-color: #000000;
+    border-color: black;
+    color: black;
+    background-image: linear-gradient(45deg, #000000 50%, transparent 75%);
+    align-self: center;
   }
 </style>
