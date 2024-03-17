@@ -534,10 +534,10 @@
           encrypt your messages that you send other people. So this is all to
           say that it is around you; its just unseen.
         </p>
-        <img src="src/components/download.jpeg" alt="Hi" />
-        <img src="src/components/download.png" alt="Hi" />
-        <img src="src/components/social.jpeg" alt="" />
-        <img src="src/components/crying.jpeg" alt="" />
+        <img src="download.jpeg" alt=""" />
+        <img src="download.png" alt="" />
+        <img src="social.jpeg" alt="" />
+        <img src="crying.jpeg" alt="" />
       </div>
 
       <button
